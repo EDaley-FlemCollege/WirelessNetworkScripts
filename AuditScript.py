@@ -9,7 +9,7 @@ def main():
 
 def Prompt_User():
 	opt = 99
-	while not (1 <= opt <= 6):
+	while not (1 <= opt <= 5):
 		opt = Get_Input()
 	if opt == 1:
 		pass
@@ -30,13 +30,37 @@ def Prompt_User():
 		print(f"Ended attack on {bssid}")
 		time.sleep(2)
 	if opt == 4:
-		print(opt)
-		#subprocess.run("clear", shell=True, executable="/bin/bash")
+		sendPrompt = True
+		while sendPrompt:
+			sendPrompt = Beacon_Prompt()
+		time.sleep(2)
 	if opt == 5:
-		print(opt)
-		#subprocess.run("clear", shell=True, executable="/bin/bash")
-	if opt == 6:
 		Exit_Script()
+
+def Beacon_Prompt():
+	channel_list = [
+	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,			# 2.4 GHz Channels
+	32, 36, 40, 44, 48,					# UNII-1 (Low Band)
+	52, 56, 60, 64,						# UNII-2 (Middle Band)
+	100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140,	# UNII-2 Extended
+	149, 153, 157, 161, 165					# UNII-3 (High Band)
+]
+	bfType = input("Enter Target Channel for single channel flood, bg for 2.4GHz band flood, or a for 5GHz band flood: ")
+	if bfType.casefold() == "bg".casefold():
+		print("2.4GHz")
+		return False
+	if bfType.casefold() == "a".casefold():
+		print("5GHz")
+		return False
+	try:
+		channel = int(bfType)
+		if channel in channel_list:
+			print(f"Channel: {channel}")
+			return False
+		else :
+			return True
+	except:
+		return True
 
 def Exit_Script():
 	print("Ending Script")
@@ -60,9 +84,8 @@ def Print_Options():
 1. WPA2 cracking attack
 2. DoS w/ authentication flood
 3. DoS w/ deauth attack
-4. DoS w/ beacon flood (2.4GHz band)
-5. DoS w/ beacon flood (single channel)
-6. Quit"""
+4. DoS w/ beacon flood
+5. Quit"""
 	subprocess.run("clear", shell=True, executable="/bin/bash")
 	print(options)
 	option = input('Enter Selection: ')
