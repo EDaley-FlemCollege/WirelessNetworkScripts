@@ -1,4 +1,5 @@
 #!/bin/bash
+BRed='\033[1;31m'
 
 apt update && apt dist-upgrade -y
-echo "Dont forget to reboot"
+printf "${BRed}Don't forget to reboot VM"
