@@ -7,16 +7,16 @@ from scapy.all import Dot11, Dot11Deauth, Dot11Disas, RadioTap, Dot11Elt, sendp,
 channels = [1,2,3,4,5,6,7,8,9,10,11,32,36,40,44,48,52,56,60,64,68,96,100,104,108,112,116,120,124,128,132,136,140,144,149,153,157,161,165,169,173,177]
 hmac = '5A:6D:67:AC:90:90'
 index = 0
-id_list = []
+id_list = set()
 s=conf.L2socket(iface='wlan0')
 
-def Main():
+def main():
 	Set_Monitor()
 	Set_Channel(str(channels[index]))
 	counter_thread = Thread(target=counter)
 	counter_thread.daemon = True
 	counter_thread.start()
-	
+
 	sniff(iface='wlan0',prn=Process_Frame,lfilter=lambda pkt: pkt.haslayer(Dot11), store=0)
 
 def Set_Monitor():
@@ -35,19 +35,21 @@ def Process_Frame(packet):
 	if packet.type == 0 and packet.subtype == 5:
 		ssid = str(packet[Dot11Elt].info)
 		ssid = ssid.split("'")
-		id_stat = [ssid[1],packet.addr2]
-		id_list.append(id_stat)
+		id_stat = f"{ssid[1]}/{packet.addr2}"
+		id_list.add(id_stat)
 
 def counter():
 	global channels
 	global index
 	global id_list
 	while True:
-		id_list = []
+		id_list = set()
 		time.sleep(2)
 		print(f"Channel: {channels[index]}")
 		#id_list = list(dict.fromkeys(id_list))
-		print(id_list)
+		for item in id_list:
+			id_values = item.split("/")
+			print(f"SSID: {id_values[0]}, BSSID: {id_values[1]}")
 		print("")
 		index +=1
 		if index > 41:
