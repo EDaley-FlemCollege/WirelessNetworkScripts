@@ -8,13 +8,27 @@ channels = [1,2,3,4,5,6,7,8,9,10,11,32,36,40,44,48,52,56,60,64,68,96,100,104,108
 hmac = '5A:6D:67:AC:90:90'
 index = 0
 id_list = []
-
 s=conf.L2socket(iface='wlan0')
 
-subprocess.run("sudo airmon-ng check kill > /dev/null", shell=True, executable="/bin/bash")
-subprocess.run("sudo airmon-ng start wlan0 > /dev/null", shell=True, executable="/bin/bash")
-change_channel="sudo iwconfig wlan0 channel "+ str(channels[index])
-subprocess.run(change_channel, shell=True, executable="/bin/bash")
+def Main():
+	Set_Monitor()
+	Set_Channel(str(channels[index]))
+	counter_thread = Thread(target=counter)
+	counter_thread.daemon = True
+	counter_thread.start()
+	
+	sniff(iface='wlan0',prn=Process_Frame,lfilter=lambda pkt: pkt.haslayer(Dot11), store=0)
+
+def Set_Monitor():
+	subprocess.run("sudo airmon-ng check kill > /dev/null", shell=True, executable="/bin/bash")
+	subprocess.run("sudo airmon-ng start wlan0 > /dev/null", shell=True, executable="/bin/bash")
+
+def Set_Managed():
+	subprocess.run("systemctl start NetworkManager", shell=True, executable="/bin/bash")
+
+def Set_Channel(channel):
+	change_channel="sudo iwconfig wlan0 channel "+channel
+	subprocess.run(change_channel, shell=True, executable="/bin/bash")
 
 def Process_Frame(packet):
 	global id_list
@@ -44,8 +58,5 @@ def counter():
 		for i in range(1,3):
 			s.send(probe_req)
 
-counter_thread = Thread(target=counter)
-counter_thread.daemon = True
-counter_thread.start()
-
-sniff(iface='wlan0',prn=Process_Frame,lfilter=lambda pkt: pkt.haslayer(Dot11), store=0)
+if __name__ == '__main__':
+    main()
