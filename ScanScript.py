@@ -32,11 +32,12 @@ def Set_Channel(channel):
 
 def Process_Frame(packet):
 	global id_list
-	if packet.type == 0 and packet.subtype == 5:
-		ssid = str(packet[Dot11Elt].info)
-		ssid = ssid.split("'")
-		id_stat = f"{ssid[1]}/{packet.addr2}"
-		id_list.add(id_stat)
+	if packet.type == 0:
+		if packet.subtype == 5 or packet.subtype == 8:
+			ssid = str(packet[Dot11Elt].info)
+			ssid = ssid.split("'")
+			id_stat = f"{ssid[1]}/{packet.addr2}"
+			id_list.add(id_stat)
 
 def counter():
 	global channels
@@ -49,7 +50,7 @@ def counter():
 		#id_list = list(dict.fromkeys(id_list))
 		for item in id_list:
 			id_values = item.split("/")
-			print(f"SSID: {id_values[0]}, BSSID: {id_values[1]}")
+			print(f"SSID: {id_values[0]}, BSSID: {id_values[-1]}")
 		print("")
 		index +=1
 		if index > 41:
