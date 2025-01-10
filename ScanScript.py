@@ -4,7 +4,11 @@ from threading import Thread
 import time,sys,subprocess,os
 from scapy.all import Dot11, Dot11Deauth, Dot11Disas, RadioTap, Dot11Elt, sendp, sniff, conf, EAPOL, Dot11EltRSN
 
-channels = [1,2,3,4,5,6,7,8,9,10,11,32,36,40,44,48,52,56,60,64,68,96,100,104,108,112,116,120,124,128,132,136,140,144,149,153,157,161,165,169,173,177]
+channels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,			# 2.4 GHz Channels
+32, 36, 40, 44, 48,					# UNII-1 (Low Band)
+52, 56, 60, 64,						# UNII-2 (Middle Band)
+100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140,	# UNII-2 Extended
+149, 153, 157, 161, 165]				# UNII-3 (High Band)
 hmac = '5A:6D:67:AC:90:90'
 index = 0
 id_list = set()
